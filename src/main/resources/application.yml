@@ -1,1 +1,23 @@
+spring:
+  application:
+    name: account-service
+  jpa:
+    hibernate:
+      ddl-auto: create
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/bankserivce
+    username: root
+    password: '00000000'
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
 
+othercompanyaccount:
+  regist:
+    status:
+      pending: "PENDING"
+      canceled: "CANCELED"
+      confirmed: "CONFIRMED"
+      rejected: "REJECTED"

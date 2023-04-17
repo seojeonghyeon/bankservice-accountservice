@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.jpa;
+package com.zayden.bankserviceaccountservice.jpa.rdb;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,5 +33,8 @@ public class OtherCompanyAccountEntity {
 
     @Column(nullable = false)
     private LocalDateTime registAt;
+
+    @Column(nullable = false)
+    private boolean isEnabled;
 
 }
