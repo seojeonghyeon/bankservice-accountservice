@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <springProperty name="filePath" source="logging.file.path"/>
 
-    <appender name="TRANSACTION" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/bankservice/userservice/transaction.log</file>
+    <appender name="TRANSACTION" class="ch.qos.logback.core.ConsoleAppender">
+        <!--Mac 권한 문제로 Console 출력으로 변경 -->
+        <!--    <appender name="TRANSACTION" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+        <file>${filePath}/accountservice/transaction.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
@@ -12,7 +15,7 @@
             <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level %-20([%thread]) %logger - %msg%n%ex{20}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/bankservice/userservice/transaction-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${filePath}/accountservice/transaction-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -21,7 +24,7 @@
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="TRANSACTION"/>
     </root>
 
     <logger name="com.zayden.bankserviceaccountservice.service.LoggerHelper.TRANSACTION" additivity="false">

@@ -2,7 +2,6 @@ package com.zayden.bankserviceaccountservice.jpa.rdb;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 

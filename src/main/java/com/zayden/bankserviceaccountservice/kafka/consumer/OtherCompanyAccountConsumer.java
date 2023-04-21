@@ -34,10 +34,10 @@ public class OtherCompanyAccountConsumer {
         ObjectMapper objectMapper = new ObjectMapper();
         try{
             objectMap = objectMapper.readValue(kafkaMessage, new TypeReference<Map<Object, Object>>() {});
-            LinkedHashMap<String, Object> payload = (LinkedHashMap<String, Object>) objectMap.get("payload");
+            LinkedHashMap<String, Object> payload = (LinkedHashMap<String, Object>) objectMap.get("payloadAddOtherCompanyAccountDto");
 
             OtherCompanyAccountDto otherCompanyAccountDto = OtherCompanyAccountDto.builder()
-                    .userId((String) payload.get("pay_id"))
+                    .userId((String) payload.get("user_id"))
                     .financialCompany((String) payload.get("financial_company"))
                     .accountNumber((String) payload.get("account_number"))
                     .accountStatus((String) payload.get("account_status"))

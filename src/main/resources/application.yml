@@ -4,16 +4,21 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/bankserivce
+    url: jdbc:mariadb://localhost:3306/bankservice
     username: root
     password: '00000000'
   data:
     redis:
-      host: 127.0.0.1
+      jedis:
+        pool:
+          min-idle: 0
+          max-idle: 8
+          max-active: 8
       port: 6379
-
+      host: 127.0.0.1
 othercompanyaccount:
   regist:
     status:
@@ -21,3 +26,5 @@ othercompanyaccount:
       canceled: "CANCELED"
       confirmed: "CONFIRMED"
       rejected: "REJECTED"
+server:
+  port: 0

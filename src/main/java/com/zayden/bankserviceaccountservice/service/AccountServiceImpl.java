@@ -1,6 +1,5 @@
 package com.zayden.bankserviceaccountservice.service;
 
-import com.zayden.bankserviceaccountservice.dto.LogOtherCompanyAccountDto;
 import com.zayden.bankserviceaccountservice.dto.OtherCompanyAccountDto;
 import com.zayden.bankserviceaccountservice.jpa.rdb.OtherCompanyAccountEntity;
 import com.zayden.bankserviceaccountservice.jpa.rdb.OtherCompanyAccountRepository;
@@ -26,6 +25,11 @@ public class AccountServiceImpl implements AccountService{
     private final OtherCompanyAccountRepository otherCompanyAccountRepository;
     private final OtherCompanyAccountCacheRepository otherCompanyAccountCacheRepository;
 
+    /*
+     * Method : 타행의 계좌를 등록
+     * Cache DB에 계좌정보가 존재한다면 false
+     * 등록되지 않은 사용자이거나 Cache DB에 계좌정보가 존재하지 않는다면 등록 처리 후 true
+     */
     @Override
     public boolean AddOtherCompanyAccount(OtherCompanyAccountDto otherCompanyAccountDto) {
 
@@ -56,11 +60,14 @@ public class AccountServiceImpl implements AccountService{
     }
 
     private void RegistNewOtherCompanyAccount(OtherCompanyAccountDto otherCompanyAccountDto){
+        //타행의 계좌에서 정보를 가져와서 RDS에 저장
+        BigInteger balance = BigInteger.valueOf(1000);
+
         OtherCompanyAccountEntity otherCompanyAccountEntity = OtherCompanyAccountEntity.builder()
                 .userId(otherCompanyAccountDto.getUserId())
                 .financialCompany(otherCompanyAccountDto.getFinancialCompany())
                 .accountNumber(otherCompanyAccountDto.getAccountNumber())
-                .balance(BigInteger.valueOf(1000))
+                .balance(balance)
                 .accountStatus(env.getProperty("othercompanyaccount.regist.status.confirmed"))
                 .isEnabled(true)
                 .registAt(LocalDateTime.now())

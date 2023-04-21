@@ -1,10 +1,10 @@
 package com.zayden.bankserviceaccountservice.jpa.redis;
 
-import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.util.List;
 
@@ -13,6 +13,10 @@ import java.util.List;
 @RedisHash("other_company_account_cache")
 public class OtherCompanyAccountCacheEntity {
     @Id
-    String userId;
+    private String id;
+
+    @Indexed
+    private String userId;
+
     List<String> accountNumberList;
 }
