@@ -8,7 +8,7 @@ import java.math.BigInteger;
 
 @Data
 @Builder
-public class OtherCompanyAccountDto {
+public class AccountDto {
     private String userId;
     private String financialCompany;
     private String accountNumber;

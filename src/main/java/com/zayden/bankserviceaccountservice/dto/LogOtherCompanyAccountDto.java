@@ -7,5 +7,5 @@ import lombok.Data;
 @Builder
 public class LogOtherCompanyAccountDto {
     private String statusAccountDto;
-    private OtherCompanyAccountDto accountDto;
+    private AccountDto accountDto;
 }

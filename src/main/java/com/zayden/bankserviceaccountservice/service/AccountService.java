@@ -1,7 +1,7 @@
 package com.zayden.bankserviceaccountservice.service;
 
-import com.zayden.bankserviceaccountservice.dto.OtherCompanyAccountDto;
+import com.zayden.bankserviceaccountservice.dto.AccountDto;
 
 public interface AccountService {
-    boolean AddOtherCompanyAccount(OtherCompanyAccountDto otherCompanyAccountDto);
+    boolean AddOtherCompanyAccount(AccountDto otherCompanyAccountDto);
 }

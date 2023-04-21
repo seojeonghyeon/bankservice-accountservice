@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zayden.bankserviceaccountservice.dto.LogOtherCompanyAccountDto;
-import com.zayden.bankserviceaccountservice.dto.OtherCompanyAccountDto;
+import com.zayden.bankserviceaccountservice.dto.AccountDto;
 import com.zayden.bankserviceaccountservice.service.AccountService;
 import com.zayden.bankserviceaccountservice.service.LoggerHelper;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class OtherCompanyAccountConsumer {
             objectMap = objectMapper.readValue(kafkaMessage, new TypeReference<Map<Object, Object>>() {});
             LinkedHashMap<String, Object> payload = (LinkedHashMap<String, Object>) objectMap.get("payloadAddOtherCompanyAccountDto");
 
-            OtherCompanyAccountDto otherCompanyAccountDto = OtherCompanyAccountDto.builder()
+            AccountDto otherCompanyAccountDto = AccountDto.builder()
                     .userId((String) payload.get("user_id"))
                     .financialCompany((String) payload.get("financial_company"))
                     .accountNumber((String) payload.get("account_number"))
@@ -56,7 +56,7 @@ public class OtherCompanyAccountConsumer {
             e.printStackTrace();
         }
     }
-    private void printTransaction(String status, OtherCompanyAccountDto otherCompanyAccountDto){
+    private void printTransaction(String status, AccountDto otherCompanyAccountDto){
         otherCompanyAccountDto.setAccountStatus(status);
         LogOtherCompanyAccountDto logOtherCompanyAccountDto = LogOtherCompanyAccountDto.builder()
                 .statusAccountDto("ADD")

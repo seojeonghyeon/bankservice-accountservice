@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
-
 import java.util.List;
 
 @Data
@@ -18,5 +17,7 @@ public class OtherCompanyAccountCacheEntity {
     @Indexed
     private String userId;
 
-    List<String> accountNumberList;
+    //AcountInfo to JSON String
+    private List<String> accountList;
+
 }
