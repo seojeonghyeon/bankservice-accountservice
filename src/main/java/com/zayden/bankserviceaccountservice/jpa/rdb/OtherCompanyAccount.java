@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(of = "id")
 @Builder @AllArgsConstructor @NoArgsConstructor
 @Table(name = "other_company_accounts")
-public class OtherCompanyAccountEntity {
+public class OtherCompanyAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +24,7 @@ public class OtherCompanyAccountEntity {
     @Column(nullable = false, length = 120, unique = true)
     private String accountNumber;
 
-    @Column(nullable = false)
+    @Column
     private BigInteger balance;
 
     @Column(nullable = false)

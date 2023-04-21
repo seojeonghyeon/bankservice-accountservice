@@ -28,3 +28,13 @@ othercompanyaccount:
       rejected: "REJECTED"
 server:
   port: 0
+bank:
+  list:
+    kbbank-service:
+      ip: 127.0.0.1
+    ibkbank-service:
+      ip: 127.0.0.1
+kafka:
+  topic:
+    add-other-company-account: "userservice-add-othercompanyaccount"
+    update-other-company-account: "userservice-update-othercompanyaccount"

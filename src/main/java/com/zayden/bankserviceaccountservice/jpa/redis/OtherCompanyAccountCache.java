@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @Builder
 @RedisHash("other_company_account_cache")
-public class OtherCompanyAccountCacheEntity {
+public class OtherCompanyAccountCache {
     @Id
     private String id;
 
