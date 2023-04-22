@@ -11,6 +11,7 @@ import com.zayden.bankserviceaccountservice.client.IBKbankClient;
 import com.zayden.bankserviceaccountservice.client.KBbankClient;
 import com.zayden.bankserviceaccountservice.othercompany.redis.OtherCompanyAccountCache;
 import com.zayden.bankserviceaccountservice.othercompany.redis.OtherCompanyAccountCacheRepository;
+import com.zayden.bankserviceaccountservice.transfer.TransferDto;
 import com.zayden.bankserviceaccountservice.vo.ibkbank.RequestIBKbankAccountInfo;
 import com.zayden.bankserviceaccountservice.vo.kbbank.RequestKBbankAccountInfo;
 import com.zayden.bankserviceaccountservice.vo.ibkbank.ResponseIBKbankAccountInfo;
@@ -37,6 +38,8 @@ public class AccountServiceImpl implements AccountService{
     private final OtherCompanyAccountRepository otherCompanyAccountRepository;
     private final OtherCompanyAccountHistoryRepository otherCompanyAccountHistoryRepository;
     private final OtherCompanyAccountCacheRepository otherCompanyAccountCacheRepository;
+    private final AccountRepository accountRepository;
+    private final AccountHistoryRepository accountHistoryRepository;
     private final CircuitBreakerFactory circuitBreakerFactory;
     private final KBbankClient kBbankClient;
     private final IBKbankClient ibkbankClient;
@@ -88,6 +91,30 @@ public class AccountServiceImpl implements AccountService{
                     otherCompanyAccountCacheRepository.save(selectUser);
                 }
             });
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean transferAccount(TransferDto transferDto) {
+        Optional<Account> optionalAccount = accountRepository.findByUserIdAndMainAccountIs(transferDto.getUserId(), true);
+        if(optionalAccount.isPresent()) {
+            Account mainAccount = optionalAccount.get();
+            AccountHistory accountHistory = AccountHistory.builder()
+                    .account(mainAccount)
+                    .accountNumber(transferDto.getOutAccountNumber())
+                    .cost(transferDto.getCost())
+                    .amount(mainAccount.getBalance().subtract(transferDto.getCost()))
+                    .historyCreateTimeAt(LocalDateTime.now())
+                    .content(transferDto.getOutContent())
+                    .isCharge(false)
+                    .build();
+            optionalAccount.ifPresent(selectUser -> {
+                selectUser.getBalance().subtract(transferDto.getCost());
+                accountRepository.save(selectUser);
+            });
+            accountHistoryRepository.save(accountHistory);
             return true;
         }
         return false;

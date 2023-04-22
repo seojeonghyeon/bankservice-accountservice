@@ -26,6 +26,12 @@ othercompanyaccount:
       canceled: "CANCELED"
       confirmed: "CONFIRMED"
       rejected: "REJECTED"
+  transfer:
+    status:
+      pending: "PENDING"
+      confirmed: "CONFIRMED"
+      canceled: "CANCELED"
+      rejected: "REJECTED"
 server:
   port: 0
 bank:
@@ -38,3 +44,4 @@ kafka:
   topic:
     add-other-company-account: "userservice-add-othercompanyaccount"
     update-other-company-account: "userservice-update-othercompanyaccount"
+    tranfer-other-company-account: "userservice-tranfer-othercompanyaccount"
