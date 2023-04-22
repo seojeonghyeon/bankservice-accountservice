@@ -27,7 +27,7 @@
         <appender-ref ref="TRANSACTION"/>
     </root>
 
-    <logger name="com.zayden.bankserviceaccountservice.service.LoggerHelper.TRANSACTION" additivity="false">
+    <logger name="com.zayden.bankserviceaccountservice.helper.LoggerHelper.TRANSACTION" additivity="false">
         <level value = "INFO" />
         <appender-ref ref="TRANSACTION" />
     </logger>

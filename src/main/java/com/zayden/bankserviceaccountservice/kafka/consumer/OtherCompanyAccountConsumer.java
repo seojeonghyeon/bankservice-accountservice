@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zayden.bankserviceaccountservice.dto.LogOtherCompanyAccountDto;
-import com.zayden.bankserviceaccountservice.dto.AccountDto;
-import com.zayden.bankserviceaccountservice.service.AccountService;
-import com.zayden.bankserviceaccountservice.service.LoggerHelper;
+import com.zayden.bankserviceaccountservice.account.LogAccountDto;
+import com.zayden.bankserviceaccountservice.account.AccountDto;
+import com.zayden.bankserviceaccountservice.account.AccountService;
+import com.zayden.bankserviceaccountservice.helper.LoggerHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -81,9 +81,9 @@ public class OtherCompanyAccountConsumer {
                     .accountStatus((String) payload.get("account_status"))
                     .build();
 
-            String pendingStatus = env.getProperty("othercompanyaccount.regist.status.confirmed");
-            boolean isNotConfirmedStatus = pendingStatus.equals(otherCompanyAccountDto.getAccountStatus()) ? false : true;
-            if(isNotConfirmedStatus && accountService.UpdateOtherCompanyAccount(otherCompanyAccountDto)){
+            String rejectedStatus = env.getProperty("othercompanyaccount.regist.status.rejected");
+            boolean isNotRejectedStatus = rejectedStatus.equals(otherCompanyAccountDto.getAccountStatus()) ? false : true;
+            if(isNotRejectedStatus && accountService.UpdateOtherCompanyAccount(otherCompanyAccountDto)){
                 printTransaction("UPDATE",env.getProperty("othercompanyaccount.regist.status.confirmed"), otherCompanyAccountDto);
             }
         } catch (JsonMappingException e) {
@@ -95,7 +95,7 @@ public class OtherCompanyAccountConsumer {
 
     private void printTransaction(String actionName, String status, AccountDto otherCompanyAccountDto){
         otherCompanyAccountDto.setAccountStatus(status);
-        LogOtherCompanyAccountDto logOtherCompanyAccountDto = LogOtherCompanyAccountDto.builder()
+        LogAccountDto logOtherCompanyAccountDto = LogAccountDto.builder()
                 .statusAccountDto(actionName)
                 .accountDto(otherCompanyAccountDto)
                 .build();

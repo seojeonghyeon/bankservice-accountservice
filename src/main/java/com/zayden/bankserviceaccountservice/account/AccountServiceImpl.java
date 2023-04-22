@@ -1,14 +1,16 @@
-package com.zayden.bankserviceaccountservice.service;
+package com.zayden.bankserviceaccountservice.account;
 
+import com.zayden.bankserviceaccountservice.othercompany.OtherCompanyService;
+import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccount;
+import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccountHistory;
+import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccountHistoryRepository;
+import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccountRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zayden.bankserviceaccountservice.client.IBKbankClient;
 import com.zayden.bankserviceaccountservice.client.KBbankClient;
-import com.zayden.bankserviceaccountservice.dto.AccountDto;
-import com.zayden.bankserviceaccountservice.jpa.rdb.OtherCompanyAccount;
-import com.zayden.bankserviceaccountservice.jpa.rdb.OtherCompanyAccountRepository;
-import com.zayden.bankserviceaccountservice.jpa.redis.OtherCompanyAccountCache;
-import com.zayden.bankserviceaccountservice.jpa.redis.OtherCompanyAccountCacheRepository;
+import com.zayden.bankserviceaccountservice.othercompany.redis.OtherCompanyAccountCache;
+import com.zayden.bankserviceaccountservice.othercompany.redis.OtherCompanyAccountCacheRepository;
 import com.zayden.bankserviceaccountservice.vo.ibkbank.RequestIBKbankAccountInfo;
 import com.zayden.bankserviceaccountservice.vo.kbbank.RequestKBbankAccountInfo;
 import com.zayden.bankserviceaccountservice.vo.ibkbank.ResponseIBKbankAccountInfo;
@@ -33,10 +35,12 @@ public class AccountServiceImpl implements AccountService{
 
     private final Environment env;
     private final OtherCompanyAccountRepository otherCompanyAccountRepository;
+    private final OtherCompanyAccountHistoryRepository otherCompanyAccountHistoryRepository;
     private final OtherCompanyAccountCacheRepository otherCompanyAccountCacheRepository;
     private final CircuitBreakerFactory circuitBreakerFactory;
     private final KBbankClient kBbankClient;
     private final IBKbankClient ibkbankClient;
+    private final OtherCompanyService otherCompanyService;
 
 
     /*
@@ -90,15 +94,38 @@ public class AccountServiceImpl implements AccountService{
     }
 
     private boolean updateOtherCompanyAccount(AccountDto otherCompanyAccountDto) {
+        String confirmedStatus = env.getProperty("othercompanyaccount.regist.status.confirmed");
+        AccountDto getAccountDto = this.getOtherCompanyAccount(otherCompanyAccountDto);
         Optional<OtherCompanyAccount> optional = otherCompanyAccountRepository.findByUserId(otherCompanyAccountDto.getUserId());
 
         optional.ifPresent(selectUser->{
-            selectUser.setEnabled(false);
-            selectUser.setAccountStatus(otherCompanyAccountDto.getAccountStatus());
-            selectUser.setBalance(BigInteger.valueOf(0));
+            selectUser.setEnabled(confirmedStatus.equals(getAccountDto.getAccountStatus()));
+            selectUser.setAccountStatus(getAccountDto.getAccountStatus());
+            selectUser.setBalance(getAccountDto.getBalance());
             otherCompanyAccountRepository.save(selectUser);
         });
+
+        List<OtherCompanyAccountHistory> otherCompanyAccountHistoryList = getOtherCompanyAccountHistoryList(otherCompanyAccountDto);
+        Optional<OtherCompanyAccountHistory> historyOptional = otherCompanyAccountHistoryRepository.findFirstByAccountNumberOrderByIdDesc(getAccountDto.getAccountNumber());
+        if(historyOptional.isPresent()){
+            OtherCompanyAccountHistory getOtherCompanyAccountHistory = historyOptional.get();
+            LocalDateTime historyTime = getOtherCompanyAccountHistory.getHistoryCreateTimeAt();
+            for(OtherCompanyAccountHistory otherCompanyAccountHistory : otherCompanyAccountHistoryList){
+                LocalDateTime getHistoryTime = otherCompanyAccountHistory.getHistoryCreateTimeAt();
+                if(getHistoryTime.isAfter(historyTime)){
+                    otherCompanyAccountHistoryRepository.save(otherCompanyAccountHistory);
+                }
+            }
+        }
         return true;
+    }
+
+    private AccountDto getOtherCompanyAccount(AccountDto otherCompanyAccountDto) {
+        return otherCompanyService.getOtherCompanyAccountByOtherCompany(otherCompanyAccountDto);
+    }
+
+    private List<OtherCompanyAccountHistory> getOtherCompanyAccountHistoryList(AccountDto otherCompanyAccountDto) {
+        return otherCompanyService.getOtherCompanyAccountHistoryByOtherCompany(otherCompanyAccountDto);
     }
 
     private String objectToJSONString(AccountDto accountDto){
@@ -156,7 +183,7 @@ public class AccountServiceImpl implements AccountService{
                 .accountNumber(otherCompanyAccountDto.getAccountNumber())
                 .build();
         ResponseKBbankAccountInfo responseKBbankAccountInfo = circuitBreaker.run(
-                ()->kBbankClient.getAccountBalance(requestKBbankAccountInfo),
+                ()->kBbankClient.getAccountInfo(requestKBbankAccountInfo),
                 throwable -> ResponseKBbankAccountInfo.builder().build()
         );
         otherCompanyAccountDto.setBalance(responseKBbankAccountInfo.getBalance());
@@ -171,7 +198,7 @@ public class AccountServiceImpl implements AccountService{
                 .accountNumber(otherCompanyAccountDto.getAccountNumber())
                 .build();
         ResponseIBKbankAccountInfo responseIBKbankAccountInfo = circuitBreaker.run(
-                ()->ibkbankClient.getAccountBalance(requestIBKbankAccountInfo),
+                ()->ibkbankClient.getAccountInfo(requestIBKbankAccountInfo),
                 throwable -> ResponseIBKbankAccountInfo.builder().build()
         );
         otherCompanyAccountDto.setBalance(responseIBKbankAccountInfo.getBalance());

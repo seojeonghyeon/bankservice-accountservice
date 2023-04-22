@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.jpa.rdb;
+package com.zayden.bankserviceaccountservice.othercompany.rdb;
 
 import org.springframework.data.repository.CrudRepository;
 

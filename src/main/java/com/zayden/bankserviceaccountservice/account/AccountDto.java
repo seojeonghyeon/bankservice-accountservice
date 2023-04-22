@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.dto;
+package com.zayden.bankserviceaccountservice.account;
 
 
 import lombok.Builder;
