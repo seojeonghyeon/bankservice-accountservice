@@ -2,9 +2,9 @@
 <configuration>
     <springProperty name="filePath" source="logging.file.path"/>
 
-    <appender name="TRANSACTION" class="ch.qos.logback.core.ConsoleAppender">
+<!--    <appender name="TRANSACTION" class="ch.qos.logback.core.ConsoleAppender">-->
         <!--Mac 권한 문제로 Console 출력으로 변경 -->
-        <!--    <appender name="TRANSACTION" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+    <appender name="TRANSACTION" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${filePath}/accountservice/transaction.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
