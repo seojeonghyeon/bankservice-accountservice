@@ -2,7 +2,6 @@ package com.zayden.bankserviceaccountservice.othercompany;
 
 import com.zayden.bankserviceaccountservice.account.AccountDto;
 import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.ResponseOtherCompanyAccountHistory;
 
 import java.util.List;
 

@@ -4,7 +4,6 @@ import com.zayden.bankserviceaccountservice.account.AccountDto;
 import com.zayden.bankserviceaccountservice.client.IBKbankClient;
 import com.zayden.bankserviceaccountservice.client.KBbankClient;
 import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.ResponseOtherCompanyAccountHistory;
 import com.zayden.bankserviceaccountservice.vo.ibkbank.RequestIBKbankAccountHistory;
 import com.zayden.bankserviceaccountservice.vo.ibkbank.RequestIBKbankAccountInfo;
 import com.zayden.bankserviceaccountservice.vo.ibkbank.ResponseIBKbankAccountHistory;

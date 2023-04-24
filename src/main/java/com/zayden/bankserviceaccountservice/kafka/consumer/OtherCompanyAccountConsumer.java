@@ -96,43 +96,6 @@ public class OtherCompanyAccountConsumer {
         }
     }
 
-    /*
-     * API NAME : kakaobank 주 계좌에서 타행의 계좌로 이체
-     * Description
-     * kakaobank 주 계좌에서 타행의 계좌로 이체한다.
-     */
-    @KafkaListener(topics = "${kafka.topic.transfer-other-company-account}")
-    public void transferOtherCompanyAccount(String kafkaMessage){
-        Map<Object, Object> objectMap = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
-        try{
-            objectMap = objectMapper.readValue(kafkaMessage, new TypeReference<Map<Object, Object>>() {});
-            LinkedHashMap<String, Object> payload = (LinkedHashMap<String, Object>) objectMap.get("payloadTransferDto");
-
-            TransferDto transferDto = TransferDto.builder()
-                    .userId((String) payload.get("user_id"))
-                    .outFinancialCompany((String) payload.get("out_financial_company"))
-                    .outAccountNumber((String) payload.get("out_account_number"))
-                    .outContent((String) payload.get("out_content"))
-                    .inFinancialCompany((String) payload.get("in_financial_company"))
-                    .inAccountNumber((String) payload.get("in_account_number"))
-                    .inContent((String) payload.get("in_content"))
-                    .cost((BigInteger) payload.get("cost"))
-                    .status((String) payload.get("status"))
-                    .build();
-
-            String pendingStatus = env.getProperty("othercompanyaccount.regist.status.pending");
-            boolean isPendingStatus = pendingStatus.equals(transferDto.getStatus()) ? true : false;
-            if(isPendingStatus && accountService.transferAccount(transferDto)){
-                printTransferTransaction("TRANSFER",env.getProperty("othercompanyaccount.transfer.status.confirmed"), transferDto);
-            }
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void printTransferTransaction(String actionName, String status, TransferDto transferDto){
         transferDto.setStatus(status);
         LogTransferDto logTransferDto = LogTransferDto.builder()

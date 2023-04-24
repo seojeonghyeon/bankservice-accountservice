@@ -7,20 +7,15 @@ import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccount
 import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccountRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zayden.bankserviceaccountservice.client.IBKbankClient;
-import com.zayden.bankserviceaccountservice.client.KBbankClient;
 import com.zayden.bankserviceaccountservice.othercompany.redis.OtherCompanyAccountCache;
 import com.zayden.bankserviceaccountservice.othercompany.redis.OtherCompanyAccountCacheRepository;
 import com.zayden.bankserviceaccountservice.transfer.TransferDto;
-import com.zayden.bankserviceaccountservice.vo.ibkbank.RequestIBKbankAccountInfo;
-import com.zayden.bankserviceaccountservice.vo.kbbank.RequestKBbankAccountInfo;
-import com.zayden.bankserviceaccountservice.vo.ibkbank.ResponseIBKbankAccountInfo;
-import com.zayden.bankserviceaccountservice.vo.kbbank.ResponseKBbankAccountInfo;
+import com.zayden.bankserviceaccountservice.vo.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -40,15 +35,8 @@ public class AccountServiceImpl implements AccountService{
     private final OtherCompanyAccountCacheRepository otherCompanyAccountCacheRepository;
     private final AccountRepository accountRepository;
     private final AccountHistoryRepository accountHistoryRepository;
-    private final CircuitBreakerFactory circuitBreakerFactory;
-    private final KBbankClient kBbankClient;
-    private final IBKbankClient ibkbankClient;
     private final OtherCompanyService otherCompanyService;
 
-
-    /*
-     * 타행의 계좌 등록 Method
-     */
     @Override
     public boolean AddOtherCompanyAccount(AccountDto otherCompanyAccountDto) {
         String userId = otherCompanyAccountDto.getUserId();
@@ -97,27 +85,141 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public boolean transferAccount(TransferDto transferDto) {
-        Optional<Account> optionalAccount = accountRepository.findByUserIdAndMainAccountIs(transferDto.getUserId(), true);
+    public ResponseEntity transferAccount(RequestTransferOtherCompanyAccount requestTransferOtherCompanyAccount) {
+        Optional<Account> optionalAccount = accountRepository.findByUserIdAndMainAccountIs(requestTransferOtherCompanyAccount.getUserId(), true);
         if(optionalAccount.isPresent()) {
             Account mainAccount = optionalAccount.get();
             AccountHistory accountHistory = AccountHistory.builder()
                     .account(mainAccount)
-                    .accountNumber(transferDto.getOutAccountNumber())
-                    .cost(transferDto.getCost())
-                    .amount(mainAccount.getBalance().subtract(transferDto.getCost()))
+                    .accountNumber(requestTransferOtherCompanyAccount.getOutAccountNumber())
+                    .cost(requestTransferOtherCompanyAccount.getCost())
+                    .amount(mainAccount.getBalance().subtract(requestTransferOtherCompanyAccount.getCost()))
                     .historyCreateTimeAt(LocalDateTime.now())
-                    .content(transferDto.getOutContent())
+                    .content(requestTransferOtherCompanyAccount.getOutContent())
                     .isCharge(false)
                     .build();
             optionalAccount.ifPresent(selectUser -> {
-                selectUser.getBalance().subtract(transferDto.getCost());
+                selectUser.getBalance().subtract(requestTransferOtherCompanyAccount.getCost());
                 accountRepository.save(selectUser);
             });
             accountHistoryRepository.save(accountHistory);
-            return true;
+            return ResponseEntity.ok().build();
         }
-        return false;
+        return ResponseEntity.badRequest().build();
+    }
+
+    @Override
+    public ResponseMainAccount getMainAccount(RequestMainAccount requestMainAccount) {
+        Optional<Account> optionalAccount = accountRepository.findByUserIdAndMainAccountIs(requestMainAccount.getUserId(), true);
+        if(optionalAccount.isPresent()){
+            Account account = optionalAccount.get();
+            ResponseMainAccount responseMainAccount = ResponseMainAccount.builder()
+                    .userId(account.getUserId())
+                    .financialCompany(account.getFinancialCompany())
+                    .accountNumber(account.getAccountNumber())
+                    .accountStatus(account.getAccountStatus())
+                    .build();
+            return responseMainAccount;
+        }
+        ResponseMainAccount responseMainAccount = ResponseMainAccount.builder().build();
+        return responseMainAccount;
+    }
+
+    @Override
+    public List<ResponseOtherCompanyAccountHistory> getOtherComapanyAccountHistory(RequestOtherCompanyAccount requestOtherCompanyAccount, Pageable pageable) {
+        Optional<List<AccountHistory>> optionalAccountHistory = accountHistoryRepository.findByAccountNumberOrderByIdDesc(requestOtherCompanyAccount.getAccountNumber(), pageable);
+        List<ResponseOtherCompanyAccountHistory> list = new ArrayList<>();
+        if(optionalAccountHistory.isPresent()){
+            for(AccountHistory accountHistory: optionalAccountHistory.get()){
+                ResponseOtherCompanyAccountHistory responseOtherCompanyAccountHistory = ResponseOtherCompanyAccountHistory.builder()
+                        .content(accountHistory.getContent())
+                        .historyCreateTimeAt(accountHistory.getHistoryCreateTimeAt())
+                        .cost(accountHistory.getCost())
+                        .amount(accountHistory.getAmount())
+                        .isCharge(accountHistory.isCharge())
+                        .build();
+                list.add(responseOtherCompanyAccountHistory);
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public ResponseOtherCompanyAccountHistory getAccountHistoryRecentlyOneCase(RequestOtherCompanyAccount requestOtherCompanyAccount) {
+        Optional<AccountHistory> optional = accountHistoryRepository.findFirstByAccountNumberOrderByIdDesc(requestOtherCompanyAccount.getAccountNumber());
+
+        if(optional.isPresent()){
+            AccountHistory accountHistory = optional.get();
+            ResponseOtherCompanyAccountHistory responseOtherCompanyAccountHistory = ResponseOtherCompanyAccountHistory.builder()
+                    .historyCreateTimeAt(accountHistory.getHistoryCreateTimeAt())
+                    .cost(accountHistory.getCost())
+                    .content(accountHistory.getContent())
+                    .amount(accountHistory.getAmount())
+                    .isCharge(accountHistory.isCharge())
+                    .build();
+            return responseOtherCompanyAccountHistory;
+        }
+
+        ResponseOtherCompanyAccountHistory responseOtherCompanyAccountHistory = ResponseOtherCompanyAccountHistory.builder().build();
+        return responseOtherCompanyAccountHistory;
+    }
+
+    @Override
+    public ResponseOtherCompanyAccount getOtherCompanyAccount(RequestOtherCompanyAccount requestOtherCompanyAccount) {
+        ResponseOtherCompanyAccount responseOtherCompanyAccount = ResponseOtherCompanyAccount.builder().build();
+        Optional<OtherCompanyAccountCache> optional = otherCompanyAccountCacheRepository.findByUserId(requestOtherCompanyAccount.getUserId());
+        if(optional.isPresent()){
+            OtherCompanyAccountCache otherCompanyAccountCache = optional.get();
+            List<String> list = otherCompanyAccountCache.getAccountList();
+
+            AccountDto accountDto = AccountDto.builder()
+                    .userId(requestOtherCompanyAccount.getUserId())
+                    .financialCompany(requestOtherCompanyAccount.getFinancialCompany())
+                    .accountNumber(requestOtherCompanyAccount.getAccountNumber())
+                    .accountStatus(requestOtherCompanyAccount.getAccountNumber())
+                    .build();
+
+            String jsonData = objectToJSONString(accountDto);
+            for(String accountInfo : list){
+                if(jsonData.equals(accountInfo)){
+                    AccountDto result = jsonStringToObject(accountInfo);
+                    responseOtherCompanyAccount = ResponseOtherCompanyAccount.builder()
+                            .userId(result.getUserId())
+                            .accountNumber(result.getAccountNumber())
+                            .financialCompany(result.getFinancialCompany())
+                            .accountStatus(result.getAccountStatus())
+                            .balance(result.getBalance())
+                            .build();
+                }
+            }
+
+        }
+        return responseOtherCompanyAccount;
+    }
+
+    @Override
+    public ResponseSearchOtherCompanyAccountList searchAllOtherCompanyAccountList(RequestSearchOtherCompanyAccountList requestSearchOtherCompanyAccountList) {
+        List<ResponseOtherCompanyAccount> responseOtherCompanyAccountList = new ArrayList<>();
+        Optional<OtherCompanyAccountCache> optional = otherCompanyAccountCacheRepository.findByUserId(requestSearchOtherCompanyAccountList.getUserId());
+        if(optional.isPresent()){
+            OtherCompanyAccountCache otherCompanyAccountCache = optional.get();
+            List<String> list = otherCompanyAccountCache.getAccountList();
+            for(String accountInfo : list){
+                AccountDto result = jsonStringToObject(accountInfo);
+                ResponseOtherCompanyAccount responseOtherCompanyAccount = ResponseOtherCompanyAccount.builder()
+                        .userId(result.getUserId())
+                        .accountNumber(result.getAccountNumber())
+                        .financialCompany(result.getFinancialCompany())
+                        .accountStatus(result.getAccountStatus())
+                        .balance(result.getBalance())
+                        .build();
+                responseOtherCompanyAccountList.add(responseOtherCompanyAccount);
+            }
+        }
+        ResponseSearchOtherCompanyAccountList responseOtherCompanyAccount = ResponseSearchOtherCompanyAccountList.builder()
+                .responseOtherCompanyAccountlist(responseOtherCompanyAccountList)
+                .build();
+        return responseOtherCompanyAccount;
     }
 
     private boolean updateOtherCompanyAccount(AccountDto otherCompanyAccountDto) {
@@ -155,6 +257,17 @@ public class AccountServiceImpl implements AccountService{
         return otherCompanyService.getOtherCompanyAccountHistoryByOtherCompany(otherCompanyAccountDto);
     }
 
+    public static AccountDto jsonStringToObject(String jsonInString){
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountDto accountDto = AccountDto.builder().build();
+        try {
+            accountDto = objectMapper.readValue(jsonInString, AccountDto.class);
+        }catch (JsonProcessingException ex){
+            ex.printStackTrace();
+        }
+        return accountDto;
+    }
+
     private String objectToJSONString(AccountDto accountDto){
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonInString = "";
@@ -167,7 +280,7 @@ public class AccountServiceImpl implements AccountService{
     }
 
     private boolean registNewOtherCompanyAccount(AccountDto otherCompanyAccountDto){
-        otherCompanyAccountDto = getOtherCompanyAccountByOtherCompany(otherCompanyAccountDto);
+        otherCompanyAccountDto = otherCompanyService.getOtherCompanyAccountByOtherCompany(otherCompanyAccountDto);
         String confirmedStatus = env.getProperty("othercompanyaccount.regist.status.confirmed");
         if(confirmedStatus.equals(otherCompanyAccountDto.getAccountStatus())) {
             BigInteger balance = otherCompanyAccountDto.getBalance();
@@ -187,49 +300,4 @@ public class AccountServiceImpl implements AccountService{
         return false;
     }
 
-    private AccountDto getOtherCompanyAccountByOtherCompany(AccountDto otherCompanyAccountDto){
-        String financialCompany = otherCompanyAccountDto.getFinancialCompany();
-        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
-        int selectFinancialCompany = switch (financialCompany){
-            case "KBbank" -> 1;
-            case "IBKbank" -> 2;
-            default -> throw new IllegalStateException("Unexpected value: " + financialCompany);
-        };
-        if(selectFinancialCompany == 1){
-            otherCompanyAccountDto = getOtherCompanyAccountByKBbank(circuitBreaker, otherCompanyAccountDto);
-        }else if(selectFinancialCompany == 2){
-            otherCompanyAccountDto = getOtherCompanyAccountByIBKbank(circuitBreaker, otherCompanyAccountDto);
-        }
-        return otherCompanyAccountDto;
-    }
-
-    private AccountDto getOtherCompanyAccountByKBbank(CircuitBreaker circuitBreaker, AccountDto otherCompanyAccountDto){
-        RequestKBbankAccountInfo requestKBbankAccountInfo = RequestKBbankAccountInfo.builder()
-                .userId(otherCompanyAccountDto.getUserId())
-                .financialCompany(otherCompanyAccountDto.getFinancialCompany())
-                .accountNumber(otherCompanyAccountDto.getAccountNumber())
-                .build();
-        ResponseKBbankAccountInfo responseKBbankAccountInfo = circuitBreaker.run(
-                ()->kBbankClient.getAccountInfo(requestKBbankAccountInfo),
-                throwable -> ResponseKBbankAccountInfo.builder().build()
-        );
-        otherCompanyAccountDto.setBalance(responseKBbankAccountInfo.getBalance());
-        otherCompanyAccountDto.setAccountStatus(responseKBbankAccountInfo.getAccountStatus());
-        return otherCompanyAccountDto;
-    }
-
-    private AccountDto getOtherCompanyAccountByIBKbank(CircuitBreaker circuitBreaker, AccountDto otherCompanyAccountDto){
-        RequestIBKbankAccountInfo requestIBKbankAccountInfo = RequestIBKbankAccountInfo.builder()
-                .userId(otherCompanyAccountDto.getUserId())
-                .financialCompany(otherCompanyAccountDto.getFinancialCompany())
-                .accountNumber(otherCompanyAccountDto.getAccountNumber())
-                .build();
-        ResponseIBKbankAccountInfo responseIBKbankAccountInfo = circuitBreaker.run(
-                ()->ibkbankClient.getAccountInfo(requestIBKbankAccountInfo),
-                throwable -> ResponseIBKbankAccountInfo.builder().build()
-        );
-        otherCompanyAccountDto.setBalance(responseIBKbankAccountInfo.getBalance());
-        otherCompanyAccountDto.setAccountStatus(responseIBKbankAccountInfo.getAccountStatus());
-        return otherCompanyAccountDto;
-    }
 }
