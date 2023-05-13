@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.vo.ibkbank;
+package com.zayden.bankserviceaccountservice.vo;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 
 @Data
 @Builder
-public class RequestIBKbankAccountHistory {
+public class RequestIBKbankAccountInfo {
     @NotNull
     private String userId;
 

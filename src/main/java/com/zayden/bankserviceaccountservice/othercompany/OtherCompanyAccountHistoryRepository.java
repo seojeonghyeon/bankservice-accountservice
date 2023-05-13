@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.othercompany.rdb;
+package com.zayden.bankserviceaccountservice.othercompany;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

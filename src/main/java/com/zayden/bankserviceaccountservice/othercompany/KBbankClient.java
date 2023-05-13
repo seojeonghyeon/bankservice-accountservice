@@ -1,9 +1,9 @@
-package com.zayden.bankserviceaccountservice.client;
+package com.zayden.bankserviceaccountservice.othercompany;
 
-import com.zayden.bankserviceaccountservice.vo.kbbank.RequestKBbankAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.kbbank.RequestKBbankAccountInfo;
-import com.zayden.bankserviceaccountservice.vo.kbbank.ResponseKBbankAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.kbbank.ResponseKBbankAccountInfo;
+import com.zayden.bankserviceaccountservice.vo.RequestKBbankAccountHistory;
+import com.zayden.bankserviceaccountservice.vo.RequestKBbankAccountInfo;
+import com.zayden.bankserviceaccountservice.vo.ResponseKBbankAccountHistory;
+import com.zayden.bankserviceaccountservice.vo.ResponseKBbankAccountInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

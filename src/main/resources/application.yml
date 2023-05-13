@@ -45,3 +45,8 @@ kafka:
     add-other-company-account: "userservice-add-othercompanyaccount"
     update-other-company-account: "userservice-update-othercompanyaccount"
     tranfer-other-company-account: "userservice-tranfer-othercompanyaccount"
+
+account_service:
+  exception:
+    account_is_empty: "No Account"
+    accountHistory_is_empty: "No Account History"

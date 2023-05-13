@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.config;
+package com.zayden.bankserviceaccountservice;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;

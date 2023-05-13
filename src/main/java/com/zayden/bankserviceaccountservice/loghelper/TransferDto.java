@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.transfer;
+package com.zayden.bankserviceaccountservice.loghelper;
 
 import lombok.Builder;
 import lombok.Data;

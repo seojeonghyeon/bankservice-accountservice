@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.vo.kbbank;
+package com.zayden.bankserviceaccountservice.vo;
 
 import lombok.Builder;
 import lombok.Data;

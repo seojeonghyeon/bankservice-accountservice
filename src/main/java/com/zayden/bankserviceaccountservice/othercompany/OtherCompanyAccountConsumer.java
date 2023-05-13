@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.kafka.consumer;
+package com.zayden.bankserviceaccountservice.othercompany;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -7,16 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zayden.bankserviceaccountservice.account.LogAccountDto;
 import com.zayden.bankserviceaccountservice.account.AccountDto;
 import com.zayden.bankserviceaccountservice.account.AccountService;
-import com.zayden.bankserviceaccountservice.helper.LoggerHelper;
-import com.zayden.bankserviceaccountservice.transfer.LogTransferDto;
-import com.zayden.bankserviceaccountservice.transfer.TransferDto;
+import com.zayden.bankserviceaccountservice.loghelper.LoggerHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -94,15 +90,6 @@ public class OtherCompanyAccountConsumer {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-    }
-
-    private void printTransferTransaction(String actionName, String status, TransferDto transferDto){
-        transferDto.setStatus(status);
-        LogTransferDto logTransferDto = LogTransferDto.builder()
-                .statusTransferDto(actionName)
-                .transferDto(transferDto)
-                .build();
-        loggerHelper.printTransaction(logTransferDto);
     }
 
     private void printOtherCompanyAccountTransaction(String actionName, String status, AccountDto otherCompanyAccountDto){

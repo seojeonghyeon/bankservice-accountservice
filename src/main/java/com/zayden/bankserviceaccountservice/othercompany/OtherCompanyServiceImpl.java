@@ -1,19 +1,16 @@
 package com.zayden.bankserviceaccountservice.othercompany;
 
 import com.zayden.bankserviceaccountservice.account.AccountDto;
-import com.zayden.bankserviceaccountservice.client.IBKbankClient;
-import com.zayden.bankserviceaccountservice.client.KBbankClient;
-import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.ibkbank.RequestIBKbankAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.ibkbank.RequestIBKbankAccountInfo;
-import com.zayden.bankserviceaccountservice.vo.ibkbank.ResponseIBKbankAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.ibkbank.ResponseIBKbankAccountInfo;
-import com.zayden.bankserviceaccountservice.vo.kbbank.RequestKBbankAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.kbbank.RequestKBbankAccountInfo;
-import com.zayden.bankserviceaccountservice.vo.kbbank.ResponseKBbankAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.kbbank.ResponseKBbankAccountInfo;
-import lombok.RequiredArgsConstructor;
+import com.zayden.bankserviceaccountservice.vo.RequestIBKbankAccountHistory;
+import com.zayden.bankserviceaccountservice.vo.RequestIBKbankAccountInfo;
+import com.zayden.bankserviceaccountservice.vo.ResponseIBKbankAccountHistory;
+import com.zayden.bankserviceaccountservice.vo.ResponseIBKbankAccountInfo;
+import com.zayden.bankserviceaccountservice.vo.RequestKBbankAccountHistory;
+import com.zayden.bankserviceaccountservice.vo.RequestKBbankAccountInfo;
+import com.zayden.bankserviceaccountservice.vo.ResponseKBbankAccountHistory;
+import com.zayden.bankserviceaccountservice.vo.ResponseKBbankAccountInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.data.domain.Pageable;
@@ -23,12 +20,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class OtherCompanyServiceImpl implements OtherCompanyService{
     private final CircuitBreakerFactory circuitBreakerFactory;
     private final KBbankClient kBbankClient;
     private final IBKbankClient ibkbankClient;
+
+    @Autowired
+    public OtherCompanyServiceImpl(CircuitBreakerFactory circuitBreakerFactory, KBbankClient kBbankClient, IBKbankClient ibkbankClient){
+        this.circuitBreakerFactory = circuitBreakerFactory;
+        this.kBbankClient = kBbankClient;
+        this.ibkbankClient = ibkbankClient;
+    }
+
     @Override
     public AccountDto getOtherCompanyAccountByOtherCompany(AccountDto otherCompanyAccountDto) {
         String financialCompany = otherCompanyAccountDto.getFinancialCompany();

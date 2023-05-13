@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.othercompany.redis;
+package com.zayden.bankserviceaccountservice.othercompany;
 
 import org.springframework.data.repository.CrudRepository;
 

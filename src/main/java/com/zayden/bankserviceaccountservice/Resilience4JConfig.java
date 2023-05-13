@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.config;
+package com.zayden.bankserviceaccountservice;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.timelimiter.TimeLimiterConfig;

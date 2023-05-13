@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.helper;
+package com.zayden.bankserviceaccountservice.loghelper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

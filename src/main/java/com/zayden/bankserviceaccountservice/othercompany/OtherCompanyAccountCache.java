@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.othercompany.redis;
+package com.zayden.bankserviceaccountservice.othercompany;
 
 import lombok.Builder;
 import lombok.Data;

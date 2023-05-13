@@ -1,18 +1,18 @@
 package com.zayden.bankserviceaccountservice.account;
 
 import com.zayden.bankserviceaccountservice.othercompany.OtherCompanyService;
-import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccount;
-import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccountHistory;
-import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccountHistoryRepository;
-import com.zayden.bankserviceaccountservice.othercompany.rdb.OtherCompanyAccountRepository;
+import com.zayden.bankserviceaccountservice.othercompany.OtherCompanyAccount;
+import com.zayden.bankserviceaccountservice.othercompany.OtherCompanyAccountHistory;
+import com.zayden.bankserviceaccountservice.othercompany.OtherCompanyAccountHistoryRepository;
+import com.zayden.bankserviceaccountservice.othercompany.OtherCompanyAccountRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zayden.bankserviceaccountservice.othercompany.redis.OtherCompanyAccountCache;
-import com.zayden.bankserviceaccountservice.othercompany.redis.OtherCompanyAccountCacheRepository;
-import com.zayden.bankserviceaccountservice.transfer.TransferDto;
+import com.zayden.bankserviceaccountservice.othercompany.OtherCompanyAccountCache;
+import com.zayden.bankserviceaccountservice.othercompany.OtherCompanyAccountCacheRepository;
 import com.zayden.bankserviceaccountservice.vo.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,6 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService{
 
     private final Environment env;
@@ -36,6 +35,21 @@ public class AccountServiceImpl implements AccountService{
     private final AccountRepository accountRepository;
     private final AccountHistoryRepository accountHistoryRepository;
     private final OtherCompanyService otherCompanyService;
+
+    @Autowired
+    public AccountServiceImpl(Environment env, OtherCompanyAccountRepository otherCompanyAccountRepository,
+                              OtherCompanyAccountHistoryRepository otherCompanyAccountHistoryRepository,
+                              OtherCompanyAccountCacheRepository otherCompanyAccountCacheRepository,
+                              AccountRepository accountRepository, AccountHistoryRepository accountHistoryRepository,
+                              OtherCompanyService otherCompanyService){
+        this.env = env;
+        this.otherCompanyAccountRepository = otherCompanyAccountRepository;
+        this.otherCompanyAccountHistoryRepository = otherCompanyAccountHistoryRepository;
+        this.otherCompanyAccountCacheRepository = otherCompanyAccountCacheRepository;
+        this.accountRepository = accountRepository;
+        this.accountHistoryRepository = accountHistoryRepository;
+        this.otherCompanyService = otherCompanyService;
+    }
 
     @Override
     public boolean AddOtherCompanyAccount(AccountDto otherCompanyAccountDto) {

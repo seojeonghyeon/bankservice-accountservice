@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.vo.kbbank;
+package com.zayden.bankserviceaccountservice.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

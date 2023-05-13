@@ -1,7 +1,5 @@
 package com.zayden.bankserviceaccountservice.account;
 
-import com.zayden.bankserviceaccountservice.account.AccountDto;
-import com.zayden.bankserviceaccountservice.transfer.TransferDto;
 import com.zayden.bankserviceaccountservice.vo.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;

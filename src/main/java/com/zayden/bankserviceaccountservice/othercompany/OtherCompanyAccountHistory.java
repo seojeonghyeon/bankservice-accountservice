@@ -1,4 +1,4 @@
-package com.zayden.bankserviceaccountservice.othercompany.rdb;
+package com.zayden.bankserviceaccountservice.othercompany;
 
 import jakarta.persistence.*;
 import lombok.*;

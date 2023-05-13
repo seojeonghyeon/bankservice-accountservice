@@ -1,9 +1,9 @@
-package com.zayden.bankserviceaccountservice.client;
+package com.zayden.bankserviceaccountservice.othercompany;
 
-import com.zayden.bankserviceaccountservice.vo.ibkbank.RequestIBKbankAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.ibkbank.RequestIBKbankAccountInfo;
-import com.zayden.bankserviceaccountservice.vo.ibkbank.ResponseIBKbankAccountHistory;
-import com.zayden.bankserviceaccountservice.vo.ibkbank.ResponseIBKbankAccountInfo;
+import com.zayden.bankserviceaccountservice.vo.RequestIBKbankAccountHistory;
+import com.zayden.bankserviceaccountservice.vo.RequestIBKbankAccountInfo;
+import com.zayden.bankserviceaccountservice.vo.ResponseIBKbankAccountHistory;
+import com.zayden.bankserviceaccountservice.vo.ResponseIBKbankAccountInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
